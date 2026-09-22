@@ -1,0 +1,7 @@
+{% if status == "done" %}
+  <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Done</span>
+{% elif status == "cancelled" %}
+  <span class="badge rounded-pill text-bg-secondary"><i class="bi bi-x-circle me-1"></i>Cancelled</span>
+{% else %}
+  <span class="badge rounded-pill text-bg-warning"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
+{% endif %}
