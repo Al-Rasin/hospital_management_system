@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Appointment{% endblock %}
+{% block heading %}Appointment{% endblock %}
+{% block subheading %}{{ appointment.patient.name }} with {{ appointment.doctor }}{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+
+  <div class="col-lg-5">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h6 class="text-uppercase text-muted small mb-0">Visit details</h6>
+          {% include "includes/status_badge.html" with status=appointment.status %}
+        </div>
+        <table class="table detail-table table-borderless mb-0">
+          <tr>
+            <th>Patient</th>
+            <td>
+              <a href="{% url 'patient_detail' appointment.patient.pk %}" class="text-decoration-none fw-medium">
+                {{ appointment.patient.name }}
+              </a>
+              <div class="text-muted small">
+                {{ appointment.patient.age }} yrs · {{ appointment.patient.get_gender_display }} · {{ appointment.patient.phone }}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th>Doctor</th>
+            <td>{{ appointment.doctor }}
+              <div class="text-muted small">{{ appointment.doctor.specialization }}</div>
+            </td>
+          </tr>
+          <tr><th>When</th><td>{{ appointment.scheduled_for|date:"d M Y, h:i A" }}</td></tr>
+          <tr><th>Reason</th><td>{{ appointment.reason|default:"—" }}</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2 mt-3">
+      <a href="{% url 'appointment_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back
+      </a>
+      {% if appointment.status == "pending" %}
+        <a href="{% url 'appointment_cancel' appointment.pk %}" class="btn btn-outline-danger"
+           onclick="return confirm('Cancel this appointment?');">
+          <i class="bi bi-x-circle me-1"></i>Cancel appointment
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="card">
+      <div class="card-body">
+        <h6 class="text-uppercase text-muted small mb-3">
+          <i class="bi bi-file-medical me-1"></i>
+          {% if prescription %}Prescription{% else %}Write prescription{% endif %}
+        </h6>
+
+        {% if not prescription %}
+          <p class="text-muted small">
+            Saving a prescription marks this appointment as <strong>Done</strong>.
+          </p>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          {% include "includes/form_fields.html" %}
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg me-1"></i>
+            {% if prescription %}Update prescription{% else %}Save prescription{% endif %}
+          </button>
+        </form>
+
+        {% if prescription %}
+          <p class="text-muted small mt-3 mb-0">
+            <i class="bi bi-clock-history me-1"></i>
+            Written {{ prescription.created_at|date:"d M Y, h:i A" }}
+          </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
